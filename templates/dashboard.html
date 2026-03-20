@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — {{ branding.site_title }}{% endblock %}
+
+{% block extra_style %}
+<style>
+  .dash-wrap {
+    max-width: 1000px; margin: 0 auto;
+    padding: 9rem 2rem 5rem;
+    position: relative; z-index: 1;
+  }
+  .dash-header {
+    display: flex; align-items: center; gap: 1.4rem; margin-bottom: 3rem;
+  }
+  .dash-avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--spork-blue), var(--spork-purple));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700;
+    color: var(--spork-deep); border: 2px solid rgba(0,212,255,0.5);
+    box-shadow: 0 0 20px rgba(0,180,255,0.3);
+  }
+  .dash-welcome h1 { font-size: 1.5rem; margin-bottom: 0.2rem; }
+  .dash-welcome p  { font-size: 0.85rem; color: rgba(200,230,255,0.45); letter-spacing: 0.1em; }
+  .role-badge {
+    display: inline-block;
+    font-family: 'Orbitron', monospace; font-size: 0.58rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.25rem 0.7rem; border-radius: 2px; margin-left: 0.6rem;
+    vertical-align: middle;
+  }
+  .role-admin { background: rgba(255,107,43,0.15); border: 1px solid var(--spork-accent); color: var(--spork-accent); }
+  .role-user  { background: rgba(0,180,255,0.1);  border: 1px solid var(--spork-blue);   color: var(--spork-blue); }
+
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.2rem; margin-bottom: 2.5rem;
+  }
+  .stat-card {
+    background: rgba(0,30,55,0.6); border: 1px solid rgba(0,180,255,0.15);
+    border-radius: 4px; padding: 1.6rem;
+    backdrop-filter: blur(8px);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .stat-card:hover { border-color: rgba(0,212,255,0.4); box-shadow: 0 0 20px rgba(0,180,255,0.08); }
+  .stat-card .label {
+    font-family: 'Orbitron', monospace; font-size: 0.6rem;
+    letter-spacing: 0.25em; color: rgba(200,230,255,0.35);
+    text-transform: uppercase; margin-bottom: 0.6rem;
+  }
+  .stat-card .value {
+    font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900;
+    color: var(--spork-blue); text-shadow: 0 0 12px var(--spork-glow);
+  }
+  .stat-card .sub { font-size: 0.75rem; color: rgba(200,230,255,0.4); margin-top: 0.3rem; }
+
+  .dash-panel {
+    background: rgba(0,30,55,0.6); border: 1px solid rgba(0,180,255,0.12);
+    border-radius: 4px; padding: 2rem; backdrop-filter: blur(8px);
+    margin-bottom: 1.5rem;
+  }
+  .dash-panel h2 {
+    font-size: 0.75rem; letter-spacing: 0.25em; color: var(--spork-blue);
+    margin-bottom: 1.2rem; text-transform: uppercase;
+    border-bottom: 1px solid rgba(0,180,255,0.1); padding-bottom: 0.7rem;
+  }
+  .activity-row {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 0.65rem 0; border-bottom: 1px solid rgba(0,180,255,0.06);
+    font-size: 0.85rem; color: rgba(200,230,255,0.6);
+  }
+  .activity-row:last-child { border-bottom: none; }
+  .activity-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--spork-blue);
+    box-shadow: 0 0 6px var(--spork-glow); flex-shrink: 0;
+  }
+  .activity-dot.green { background: var(--spork-green); box-shadow: 0 0 6px rgba(0,255,170,0.6); }
+  .activity-dot.orange { background: var(--spork-accent); box-shadow: 0 0 6px rgba(255,107,43,0.6); }
+  .activity-time { margin-left: auto; font-size: 0.7rem; color: rgba(200,230,255,0.25); letter-spacing: 0.1em; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-wrap">
+
+  <div class="dash-header">
+    <div class="dash-avatar">{{ current_user.avatar_initials }}</div>
+    <div class="dash-welcome">
+      <h1 class="glow-text">
+        Welcome back, {{ current_user.display_name }}
+        <span class="role-badge role-{{ current_user.role }}">{{ current_user.role }}</span>
+      </h1>
+      <p>{{ branding.tagline }}</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="label">Signal Strength</div>
+      <div class="value">98<span style="font-size:1rem">%</span></div>
+      <div class="sub">Constellation uplink</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Nodes Online</div>
+      <div class="value">1,042</div>
+      <div class="sub">Across 6 star systems</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Spork Index</div>
+      <div class="value">∞</div>
+      <div class="sub">Off the charts</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Session</div>
+      <div class="value" id="session-timer">00:00</div>
+      <div class="sub">Time since login</div>
+    </div>
+  </div>
+
+  <!-- Activity feed -->
+  <div class="dash-panel">
+    <h2>// Recent Transmissions</h2>
+    <div class="activity-row">
+      <div class="activity-dot green"></div>
+      <span>Spork signal calibrated — all tines aligned</span>
+      <span class="activity-time">just now</span>
+    </div>
+    <div class="activity-row">
+      <div class="activity-dot"></div>
+      <span>Constellation node #442 reported online</span>
+      <span class="activity-time">2 min ago</span>
+    </div>
+    <div class="activity-row">
+      <div class="activity-dot orange"></div>
+      <span>Asteroid field interference detected in Sector 7</span>
+      <span class="activity-time">18 min ago</span>
+    </div>
+    <div class="activity-row">
+      <div class="activity-dot green"></div>
+      <span>Deep space relay station connected successfully</span>
+      <span class="activity-time">1 hr ago</span>
+    </div>
+    <div class="activity-row">
+      <div class="activity-dot"></div>
+      <span>System config reloaded from <code style="color:var(--spork-blue)">config/app.yml</code></span>
+      <span class="activity-time">3 hrs ago</span>
+    </div>
+  </div>
+
+  {% if current_user.is_admin() %}
+  <div class="dash-panel">
+    <h2>// Admin Controls</h2>
+    <div class="activity-row">
+      <div class="activity-dot orange"></div>
+      <span>You have admin access — view full config and user list</span>
+      <a href="/settings" class="btn" style="font-size:0.65rem; padding:0.4rem 1rem; margin-left:auto;">Open Settings</a>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+  // Session timer
+  let seconds = 0;
+  setInterval(() => {
+    seconds++;
+    const m = String(Math.floor(seconds/60)).padStart(2,'0');
+    const s = String(seconds%60).padStart(2,'0');
+    document.getElementById('session-timer').textContent = m+':'+s;
+  }, 1000);
+</script>
+{% endblock %}

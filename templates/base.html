@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}{{ branding.site_title }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --spork-blue:   #00d4ff;
+      --spork-glow:   #0af;
+      --spork-deep:   #001a2e;
+      --spork-mid:    #002a45;
+      --spork-star:   #e8f4ff;
+      --spork-accent: #ff6b2b;
+      --spork-purple: #7b4fff;
+      --spork-green:  #00ffaa;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--spork-deep);
+      color: var(--spork-star);
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Starfield canvas ── */
+    #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    /* ── Cosmic grid ── */
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,180,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,180,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* ── Flash messages ── */
+    .flash-bar {
+      position: fixed; top: 72px; left: 50%; transform: translateX(-50%);
+      z-index: 200; display: flex; flex-direction: column; gap: 0.5rem;
+      width: min(500px, 90vw);
+    }
+    .flash {
+      padding: 0.75rem 1.2rem;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      border-radius: 2px;
+      animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+    .flash.warning { background: rgba(255,107,43,0.15); border: 1px solid var(--spork-accent); color: #ffaa77; }
+    .flash.info    { background: rgba(0,212,255,0.1);  border: 1px solid var(--spork-blue);   color: var(--spork-blue); }
+    .flash.error   { background: rgba(255,50,50,0.12); border: 1px solid #ff5555;             color: #ff8888; }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: linear-gradient(to bottom, rgba(0,10,20,0.95), transparent);
+      backdrop-filter: blur(4px);
+    }
+    .nav-logo {
+      font-family: 'Orbitron', monospace; font-weight: 900; font-size: 1.3rem;
+      letter-spacing: 0.1em; color: var(--spork-blue); text-decoration: none;
+      text-shadow: 0 0 18px var(--spork-glow), 0 0 40px rgba(0,212,255,0.4);
+    }
+    .nav-logo span { color: var(--spork-accent); }
+    .nav-right { display: flex; align-items: center; gap: 2.5rem; }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: 'Orbitron', monospace; font-size: 0.72rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(200,230,255,0.7); text-decoration: none;
+      transition: color 0.2s, text-shadow 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--spork-blue);
+      text-shadow: 0 0 12px var(--spork-glow);
+    }
+
+    /* Auth nav area */
+    .nav-auth { display: flex; align-items: center; gap: 1rem; }
+    .nav-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--spork-blue), var(--spork-purple));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', monospace; font-size: 0.6rem; font-weight: 700;
+      color: var(--spork-deep); letter-spacing: 0.05em;
+      border: 1px solid rgba(0,212,255,0.4);
+      box-shadow: 0 0 10px rgba(0,180,255,0.3);
+    }
+    .nav-username {
+      font-family: 'Orbitron', monospace; font-size: 0.65rem;
+      letter-spacing: 0.15em; color: rgba(200,230,255,0.6);
+    }
+    .nav-logout {
+      font-family: 'Orbitron', monospace; font-size: 0.65rem;
+      letter-spacing: 0.15em; color: rgba(200,230,255,0.4);
+      text-decoration: none; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-logout:hover { color: var(--spork-accent); }
+    .nav-login-btn {
+      font-family: 'Orbitron', monospace; font-size: 0.65rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.45rem 1.1rem;
+      border: 1px solid rgba(0,212,255,0.4);
+      color: var(--spork-blue); text-decoration: none; border-radius: 2px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-login-btn:hover { background: var(--spork-blue); color: var(--spork-deep); }
+
+    /* ── Page wrapper ── */
+    main { position: relative; z-index: 1; }
+
+    /* ── Shared ── */
+    h1, h2, h3 { font-family: 'Orbitron', monospace; letter-spacing: 0.08em; }
+    .glow-text {
+      color: var(--spork-blue);
+      text-shadow: 0 0 20px var(--spork-glow), 0 0 60px rgba(0,180,255,0.3);
+    }
+    .btn {
+      display: inline-block; font-family: 'Orbitron', monospace;
+      font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.85rem 2.2rem; border: 1px solid var(--spork-blue);
+      color: var(--spork-blue); text-decoration: none; border-radius: 2px;
+      position: relative; overflow: hidden; transition: color 0.3s, box-shadow 0.3s;
+    }
+    .btn::before {
+      content: ''; position: absolute; inset: 0; background: var(--spork-blue);
+      transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease; z-index: -1;
+    }
+    .btn:hover { color: var(--spork-deep); box-shadow: 0 0 30px rgba(0,212,255,0.5); }
+    .btn:hover::before { transform: scaleX(1); }
+    .btn-accent { background: linear-gradient(135deg, var(--spork-accent), #ff8c42); border-color: var(--spork-accent); color: white; }
+    .btn-accent::before { background: #ff8c42; }
+    .btn-accent:hover { color: white; }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 1; text-align: center; padding: 2rem;
+      font-size: 0.75rem; letter-spacing: 0.15em; color: rgba(200,230,255,0.3);
+      border-top: 1px solid rgba(0,180,255,0.1);
+    }
+  </style>
+  {% block extra_style %}{% endblock %}
+</head>
+<body>
+
+  <canvas id="starfield"></canvas>
+  <div class="grid-overlay"></div>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-bar">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <nav>
+    <a href="/" class="nav-logo">{{ branding.logo_text }}<span>{{ branding.logo_accent }}</span></a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="/"       {% if request.path == '/'       %}class="active"{% endif %}>Home</a></li>
+        <li><a href="/about"  {% if request.path == '/about'  %}class="active"{% endif %}>About</a></li>
+        <li><a href="/contact"{% if request.path == '/contact'%}class="active"{% endif %}>Contact</a></li>
+        {% if current_user.is_authenticated %}
+          <li><a href="/dashboard" {% if request.path == '/dashboard' %}class="active"{% endif %}>Dashboard</a></li>
+          {% if current_user.is_admin() %}
+            <li><a href="/settings" {% if request.path == '/settings' %}class="active"{% endif %}>Settings</a></li>
+          {% endif %}
+        {% endif %}
+      </ul>
+
+      <div class="nav-auth">
+        {% if current_user.is_authenticated %}
+          <div class="nav-avatar">{{ current_user.avatar_initials }}</div>
+          <span class="nav-username">{{ current_user.display_name }}</span>
+          <a href="/logout" class="nav-logout">Logout</a>
+        {% else %}
+          <a href="/login" class="nav-login-btn">Login</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main>{% block content %}{% endblock %}</main>
+
+  <footer>
+    &copy; 2026 {{ branding.site_title }} &mdash; {{ branding.footer_text }}
+  </footer>
+
+  <script>
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    function initStars() {
+      stars = [];
+      for (let i = 0; i < 320; i++) {
+        stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+          r: Math.random()*1.4+0.2, alpha: Math.random()*0.7+0.1,
+          speed: Math.random()*0.3+0.05, phase: Math.random()*Math.PI*2 });
+      }
+    }
+    let t = 0;
+    function draw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height); t += 0.008;
+      for (const s of stars) {
+        const a = s.alpha*(0.5+0.5*Math.sin(t*s.speed+s.phase));
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle = `rgba(200,230,255,${a})`; ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize', () => { resize(); initStars(); });
+    resize(); initStars(); draw();
+
+    // Auto-dismiss flash messages
+    setTimeout(() => {
+      document.querySelectorAll('.flash').forEach(el => {
+        el.style.transition = 'opacity 0.5s'; el.style.opacity = '0';
+        setTimeout(() => el.remove(), 500);
+      });
+    }, 4000);
+  </script>
+  {% block extra_script %}{% endblock %}
+</body>
+</html>

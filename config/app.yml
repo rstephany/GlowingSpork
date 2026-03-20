@@ -1,0 +1,34 @@
+# GlowingSpork.io — Application Configuration
+app:
+  secret_key: "change-me-before-deploying-to-production"
+  debug: true
+  host: "0.0.0.0"
+  port: 5000
+
+branding:
+  site_title: "GlowingSpork.io"
+  tagline: "Navigating the cosmos, one utensil at a time"
+  logo_text: "GlowingSpork"
+  logo_accent: ".io"
+  footer_text: "Illuminating the cosmos, one utensil at a time"
+
+session:
+  permanent: false
+  lifetime_minutes: 60
+
+login:
+  max_attempts: 5
+  lockout_minutes: 15
+  redirect_after_login: "/dashboard"
+
+# Routes that do NOT require authentication
+routes:
+  public:
+    - "/"
+    - "/about"
+    - "/contact"
+    - "/login"
+    - "/static"
+  protected:
+    - "/dashboard"
+    - "/settings"

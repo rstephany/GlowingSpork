@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Contact — GlowingSpork.io{% endblock %}
+
+{% block extra_style %}
+<style>
+  .contact-section {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 10rem 2rem 6rem;
+  }
+  .page-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    color: var(--spork-accent);
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
+  }
+  .contact-section h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 0.5rem;
+  }
+  .contact-section .sub {
+    color: rgba(200,230,255,0.5);
+    font-size: 0.95rem;
+    margin-bottom: 3rem;
+    font-style: italic;
+  }
+  .form-group { margin-bottom: 1.6rem; }
+  label {
+    display: block;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--spork-blue);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+  }
+  input, textarea {
+    width: 100%;
+    background: rgba(0,40,70,0.4);
+    border: 1px solid rgba(0,180,255,0.2);
+    border-radius: 2px;
+    padding: 0.85rem 1rem;
+    color: var(--spork-star);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus, textarea:focus {
+    border-color: var(--spork-blue);
+    box-shadow: 0 0 15px rgba(0,180,255,0.15);
+  }
+  textarea { resize: vertical; min-height: 130px; }
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1px solid var(--spork-blue);
+    color: var(--spork-blue);
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    border-radius: 2px;
+  }
+  .submit-btn:hover {
+    background: var(--spork-blue);
+    color: var(--spork-deep);
+    box-shadow: 0 0 30px rgba(0,180,255,0.4);
+  }
+  #success-msg {
+    display: none;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid rgba(0,212,255,0.3);
+    background: rgba(0,212,255,0.05);
+    color: var(--spork-blue);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-align: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-section">
+  <p class="page-label">// Open a Channel</p>
+  <h1 class="glow-text">Transmit Your Signal</h1>
+  <p class="sub">We monitor all frequencies across the constellation network.</p>
+
+  <form id="contact-form" action="#" method="POST" onsubmit="handleSubmit(event)">
+    <div class="form-group">
+      <label for="name">Your Designation</label>
+      <input type="text" id="name" name="name" placeholder="Commander Jane Doe" required />
+    </div>
+    <div class="form-group">
+      <label for="email">Transmission Address</label>
+      <input type="email" id="email" name="email" placeholder="you@sector7.space" required />
+    </div>
+    <div class="form-group">
+      <label for="message">Message Payload</label>
+      <textarea id="message" name="message" placeholder="Encode your transmission here..." required></textarea>
+    </div>
+    <button type="submit" class="submit-btn">Send Transmission</button>
+  </form>
+
+  <div id="success-msg">✦ Signal received — we'll respond across the network shortly.</div>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+  function handleSubmit(e) {
+    e.preventDefault();
+    document.getElementById('contact-form').style.opacity = '0.4';
+    document.getElementById('contact-form').style.pointerEvents = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+  }
+</script>
+{% endblock %}

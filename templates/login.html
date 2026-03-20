@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}Login — {{ branding.site_title }}{% endblock %}
+
+{% block extra_style %}
+<style>
+  .login-wrap {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 6rem 1.5rem;
+    position: relative;
+  }
+
+  /* Background image behind login */
+  .login-wrap::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: url("{{ url_for('static', filename='spork-hero.jpg') }}") center center / cover no-repeat;
+    opacity: 0.18;
+    z-index: 0;
+  }
+
+  .login-card {
+    position: relative; z-index: 1;
+    width: min(420px, 100%);
+    background: rgba(0,20,38,0.85);
+    border: 1px solid rgba(0,180,255,0.2);
+    border-radius: 4px;
+    padding: 3rem 2.5rem;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 60px rgba(0,100,180,0.15), 0 0 120px rgba(0,60,120,0.1);
+    animation: cardIn 0.5s ease both;
+  }
+  @keyframes cardIn {
+    from { opacity:0; transform: translateY(20px) scale(0.98); }
+    to   { opacity:1; transform: translateY(0)   scale(1); }
+  }
+
+  .login-spork {
+    display: flex; justify-content: center; margin-bottom: 1.8rem;
+  }
+  .login-spork svg {
+    width: 44px; height: 100px;
+    filter: drop-shadow(0 0 10px #00d4ff) drop-shadow(0 0 24px rgba(0,180,255,0.5));
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+
+  .login-title {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+  }
+  .login-sub {
+    text-align: center;
+    font-size: 0.8rem;
+    color: rgba(200,230,255,0.4);
+    font-style: italic;
+    margin-bottom: 2.2rem;
+    letter-spacing: 0.05em;
+  }
+
+  .form-group { margin-bottom: 1.4rem; }
+  label {
+    display: block;
+    font-family: 'Orbitron', monospace; font-size: 0.62rem;
+    letter-spacing: 0.25em; color: var(--spork-blue);
+    margin-bottom: 0.45rem; text-transform: uppercase;
+  }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    background: rgba(0,40,70,0.5);
+    border: 1px solid rgba(0,180,255,0.2); border-radius: 2px;
+    padding: 0.8rem 1rem;
+    color: var(--spork-star); font-family: 'Exo 2', sans-serif; font-size: 0.95rem;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.05em;
+  }
+  input[type="text"]:focus, input[type="password"]:focus {
+    border-color: var(--spork-blue);
+    box-shadow: 0 0 14px rgba(0,180,255,0.15);
+  }
+  input::placeholder { color: rgba(200,230,255,0.2); }
+
+  .remember-row {
+    display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.6rem;
+  }
+  .remember-row input[type="checkbox"] { accent-color: var(--spork-blue); width: 14px; height: 14px; }
+  .remember-row label {
+    font-size: 0.65rem; color: rgba(200,230,255,0.45); margin: 0;
+    letter-spacing: 0.1em; cursor: pointer;
+  }
+
+  .login-btn {
+    width: 100%; padding: 0.9rem;
+    font-family: 'Orbitron', monospace; font-size: 0.75rem;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    background: transparent; border: 1px solid var(--spork-blue);
+    color: var(--spork-blue); cursor: pointer; border-radius: 2px;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+  }
+  .login-btn:hover {
+    background: var(--spork-blue); color: var(--spork-deep);
+    box-shadow: 0 0 28px rgba(0,180,255,0.4);
+  }
+
+  .error-msg {
+    background: rgba(255,60,60,0.1); border: 1px solid rgba(255,80,80,0.3);
+    border-radius: 2px; padding: 0.7rem 1rem; margin-bottom: 1.4rem;
+    font-family: 'Orbitron', monospace; font-size: 0.62rem;
+    letter-spacing: 0.12em; color: #ff8888;
+    animation: shake 0.3s ease;
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25%      { transform: translateX(-6px); }
+    75%      { transform: translateX(6px); }
+  }
+
+  .login-divider {
+    border: none; border-top: 1px solid rgba(0,180,255,0.1); margin: 1.5rem 0;
+  }
+  .login-hint {
+    text-align: center; font-size: 0.68rem;
+    color: rgba(200,230,255,0.25); letter-spacing: 0.1em;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card">
+
+    <!-- Mini spork icon -->
+    <div class="login-spork">
+      <svg viewBox="0 0 60 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lg" x1="30" y1="0" x2="30" y2="140" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"  stop-color="#a8ecff"/>
+            <stop offset="40%" stop-color="#00d4ff"/>
+            <stop offset="100%" stop-color="#004466"/>
+          </linearGradient>
+          <filter id="g"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect x="25" y="74" width="10" height="55" rx="5" fill="url(#lg)" filter="url(#g)"/>
+        <ellipse cx="30" cy="52" rx="14" ry="19" fill="url(#lg)" filter="url(#g)"/>
+        <rect x="20" y="14" width="3" height="25" rx="1.5" fill="url(#lg)" filter="url(#g)"/>
+        <rect x="26" y="10" width="3" height="29" rx="1.5" fill="url(#lg)" filter="url(#g)"/>
+        <rect x="32" y="10" width="3" height="29" rx="1.5" fill="url(#lg)" filter="url(#g)"/>
+        <rect x="38" y="14" width="3" height="25" rx="1.5" fill="url(#lg)" filter="url(#g)"/>
+      </svg>
+    </div>
+
+    <h1 class="login-title glow-text">Access the Network</h1>
+    <p class="login-sub">{{ branding.tagline }}</p>
+
+    {% if error %}
+      <div class="error-msg">⚠ {{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username"
+               placeholder="your_callsign" autocomplete="username" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="••••••••••" autocomplete="current-password" required />
+      </div>
+
+      <div class="remember-row">
+        <input type="checkbox" id="remember" name="remember" />
+        <label for="remember">Stay logged in for {{ branding.site_title }}</label>
+      </div>
+
+      <button type="submit" class="login-btn">Authenticate →</button>
+    </form>
+
+    <hr class="login-divider"/>
+    <p class="login-hint">Unauthorised access will be reported to the constellation council.</p>
+  </div>
+</div>
+{% endblock %}

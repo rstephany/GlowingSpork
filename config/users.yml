@@ -1,0 +1,24 @@
+# GlowingSpork.io — User Credentials
+#
+# Passwords are hashed with werkzeug's generate_password_hash().
+# To generate a new hash, run:
+#   python3 -c "from werkzeug.security import generate_password_hash; print(generate_password_hash('yourpassword'))"
+#
+# Roles: admin | user
+#
+# Default credentials:
+#   admin   / spork123
+#   captain / cosmos99
+
+users:
+  - username: "admin"
+    password_hash: "scrypt:32768:8:1$G78E57Ijbzgv2HUw$742cd1489830af9087b5264c6c05ae34ab2fc9f024f219b2542375d91b18825866a3ef2a70cc8a798b8bffc24babe89a6d82067a1e10a1e40fe605a80eeeb143"
+    display_name: "Commander Admin"
+    role: "admin"
+    avatar_initials: "CA"
+
+  - username: "captain"
+    password_hash: "scrypt:32768:8:1$VxdRNoXF7twDdJD1$76a858653b583a2a8e1ad8c80d156a3968aecc7ca139f79e566493fd5c7490b33e3291fc44d445c77b1e663e821fc4072598fb023762dabadba79f893168de6c"
+    display_name: "Captain Cosmos"
+    role: "user"
+    avatar_initials: "CC"

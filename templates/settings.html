@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}Settings — {{ branding.site_title }}{% endblock %}
+
+{% block extra_style %}
+<style>
+  .settings-wrap { max-width: 860px; margin: 0 auto; padding: 9rem 2rem 5rem; }
+  .page-label {
+    font-family: 'Orbitron', monospace; font-size: 0.7rem;
+    letter-spacing: 0.35em; color: var(--spork-accent);
+    margin-bottom: 0.8rem; text-transform: uppercase;
+  }
+  .settings-wrap h1 { font-size: 2rem; margin-bottom: 2.5rem; }
+
+  .config-section {
+    background: rgba(0,30,55,0.6); border: 1px solid rgba(0,180,255,0.12);
+    border-radius: 4px; padding: 1.8rem; backdrop-filter: blur(8px); margin-bottom: 1.5rem;
+  }
+  .config-section h2 {
+    font-size: 0.7rem; letter-spacing: 0.25em; color: var(--spork-blue);
+    text-transform: uppercase; margin-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(0,180,255,0.1); padding-bottom: 0.6rem;
+  }
+  .config-row {
+    display: flex; gap: 1rem; padding: 0.55rem 0;
+    border-bottom: 1px solid rgba(0,180,255,0.05);
+    font-size: 0.85rem; align-items: baseline;
+  }
+  .config-row:last-child { border-bottom: none; }
+  .config-key {
+    font-family: 'Orbitron', monospace; font-size: 0.65rem;
+    letter-spacing: 0.1em; color: rgba(200,230,255,0.45);
+    min-width: 180px; flex-shrink: 0;
+  }
+  .config-val { color: var(--spork-star); font-family: monospace; font-size: 0.88rem; word-break: break-all; }
+  .config-val.secret { color: rgba(200,230,255,0.2); font-style: italic; }
+  .config-val.bool-true  { color: var(--spork-green); }
+  .config-val.bool-false { color: var(--spork-accent); }
+
+  /* Users table */
+  .user-table { width: 100%; border-collapse: collapse; }
+  .user-table th {
+    font-family: 'Orbitron', monospace; font-size: 0.6rem;
+    letter-spacing: 0.2em; color: rgba(200,230,255,0.4);
+    text-transform: uppercase; text-align: left; padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid rgba(0,180,255,0.1);
+  }
+  .user-table td {
+    padding: 0.75rem 0.8rem; font-size: 0.85rem;
+    border-bottom: 1px solid rgba(0,180,255,0.05);
+    color: rgba(200,230,255,0.7);
+  }
+  .user-table tr:last-child td { border-bottom: none; }
+  .role-badge {
+    font-family: 'Orbitron', monospace; font-size: 0.58rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.2rem 0.6rem; border-radius: 2px;
+  }
+  .role-admin { background: rgba(255,107,43,0.15); border: 1px solid var(--spork-accent); color: var(--spork-accent); }
+  .role-user  { background: rgba(0,180,255,0.1);  border: 1px solid var(--spork-blue);   color: var(--spork-blue); }
+
+  .config-file-hint {
+    font-size: 0.75rem; color: rgba(200,230,255,0.3);
+    font-style: italic; margin-top: 1rem;
+    font-family: monospace; letter-spacing: 0.05em;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-wrap">
+  <p class="page-label">// Admin Only</p>
+  <h1 class="glow-text">System Configuration</h1>
+
+  <!-- App settings -->
+  <div class="config-section">
+    <h2>App Settings — config/app.yml</h2>
+    <div class="config-row">
+      <span class="config-key">debug</span>
+      <span class="config-val {{ 'bool-true' if app_cfg.app.debug else 'bool-false' }}">
+        {{ app_cfg.app.debug }}
+      </span>
+    </div>
+    <div class="config-row">
+      <span class="config-key">host</span>
+      <span class="config-val">{{ app_cfg.app.host }}</span>
+    </div>
+    <div class="config-row">
+      <span class="config-key">port</span>
+      <span class="config-val">{{ app_cfg.app.port }}</span>
+    </div>
+    <div class="config-row">
+      <span class="config-key">secret_key</span>
+      <span class="config-val secret">[ hidden — set in config/app.yml ]</span>
+    </div>
+    <div class="config-row">
+      <span class="config-key">session lifetime</span>
+      <span class="config-val">{{ app_cfg.session.lifetime_minutes }} minutes</span>
+    </div>
+    <div class="config-row">
+      <span class="config-key">redirect after login</span>
+      <span class="config-val">{{ app_cfg.login.redirect_after_login }}</span>
+    </div>
+  </div>
+
+  <!-- Branding -->
+  <div class="config-section">
+    <h2>Branding — config/app.yml → branding</h2>
+    {% for key, val in app_cfg.branding.items() %}
+    <div class="config-row">
+      <span class="config-key">{{ key }}</span>
+      <span class="config-val">{{ val }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Routes -->
+  <div class="config-section">
+    <h2>Route Permissions — config/app.yml → routes</h2>
+    <div class="config-row">
+      <span class="config-key">public routes</span>
+      <span class="config-val">{{ app_cfg.routes.public | join(', ') }}</span>
+    </div>
+    <div class="config-row">
+      <span class="config-key">protected routes</span>
+      <span class="config-val">{{ app_cfg.routes.protected | join(', ') }}</span>
+    </div>
+  </div>
+
+  <!-- Users -->
+  <div class="config-section">
+    <h2>Users — config/users.yml</h2>
+    <table class="user-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Display Name</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.username }}</td>
+          <td>{{ u.display_name }}</td>
+          <td><span class="role-badge role-{{ u.role }}">{{ u.role }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="config-file-hint">
+      To add users, edit config/users.yml and hash passwords with:<br>
+      python3 -c "from werkzeug.security import generate_password_hash; print(generate_password_hash('yourpassword'))"
+    </p>
+  </div>
+
+</div>
+{% endblock %}

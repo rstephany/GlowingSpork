@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}About — GlowingSpork.io{% endblock %}
+
+{% block extra_style %}
+<style>
+  .about-hero-img {
+    width: 100%;
+    height: 480px;
+    background: url("{{ url_for('static', filename='spork-hero.jpg') }}") center 20% / cover no-repeat;
+    position: relative;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 3rem;
+  }
+  .about-hero-img::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,10,20,0.2) 0%, rgba(0,10,20,0.95) 100%);
+  }
+  .about-hero-img .img-caption {
+    position: relative; z-index: 1;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: rgba(200,230,255,0.4);
+    text-transform: uppercase;
+  }
+
+  .about-section {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+  .page-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    color: var(--spork-accent);
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
+  }
+  .about-section h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+    margin-bottom: 2rem;
+  }
+  .divider {
+    width: 60px; height: 2px;
+    background: linear-gradient(to right, var(--spork-blue), transparent);
+    margin: 2rem 0;
+  }
+  .about-section p {
+    font-size: 1rem;
+    line-height: 1.9;
+    color: rgba(200,230,255,0.7);
+    margin-bottom: 1.4rem;
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin: 3rem 0;
+  }
+  .stat {
+    border-left: 2px solid var(--spork-blue);
+    padding-left: 1.2rem;
+  }
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--spork-blue);
+    text-shadow: 0 0 15px var(--spork-glow);
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: rgba(200,230,255,0.45);
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-hero-img">
+  <span class="img-caption">// The Spork Signal — Deep Space Observation, Stardate 2026</span>
+</div>
+<div class="about-section">
+  <p class="page-label">// About the Signal</p>
+  <h1 class="glow-text">The Spork That Lit Up the Universe</h1>
+  <div class="divider"></div>
+
+  <p>
+    GlowingSpork.io was born at the intersection of cosmic wonder and practical utility.
+    We believe the humble spork — half fork, half spoon, fully transcendent — is the
+    perfect metaphor for the modern internet: adaptable, efficient, and inexplicably satisfying.
+  </p>
+  <p>
+    Our constellation network spans across star systems, linking space stations and deep-space
+    outposts through a lattice of pure luminescent energy. Each node pulses with the warm
+    blue glow of a thousand supercooled processors, all coordinated by the central Spork Signal.
+  </p>
+  <p>
+    We are explorers. We are engineers. We are, above all else, utensil enthusiasts with
+    very fast internet connections and a fondness for dramatic lighting.
+  </p>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Galaxies Reached</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Tines of Power</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Glowing Spork</div>
+    </div>
+  </div>
+
+  <a href="/contact" class="btn">Open a Channel</a>
+</div>
+{% endblock %}
